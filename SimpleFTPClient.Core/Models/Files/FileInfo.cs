@@ -6,7 +6,7 @@ namespace SimpleFTPClient.Core.Models.Files
 {
     public class FileInfo
     {
-        private readonly static Regex statLineRegex = new Regex(@"^([-dl])([rwx-]{9})\s+(\d)\s+(\w+)\s+(\w+)\s+(\d+)\s+(Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec\s+\d+\s+(?:\d{4}|\d{2}:\d{2}))\s+(\w+)\s?$");
+        private readonly static Regex statLineRegex = new Regex(@"^([-dl])([rwx-]{9})\s+(\d)\s+(\w+)\s+(\w+)\s+(\d+)\s+((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d+\s+(?:\d{4}|\d{2}:\d{2}))\s+([\w\.]+)$");
 
         internal FileInfo()
         {
@@ -53,9 +53,9 @@ namespace SimpleFTPClient.Core.Models.Files
             // Modification date
             DateTime modificationDate;
 
-            if (!DateTime.TryParseExact(match.Groups[7].Value, "MMM dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces, out modificationDate))
+            if (!DateTime.TryParseExact(match.Groups[7].Value, "MMM dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeUniversal, out modificationDate))
             {
-                DateTime.TryParseExact(match.Groups[7].Value, "MMM dd yyyy", CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces, out modificationDate);
+                DateTime.TryParseExact(match.Groups[7].Value, "MMM dd yyyy", CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeUniversal, out modificationDate);
             }
 
             fileInfo.ModificationDate = modificationDate;

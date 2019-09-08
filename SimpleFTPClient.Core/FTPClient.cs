@@ -1,6 +1,6 @@
-﻿using System;
+﻿using SimpleFTPClient.Core.Models.Files;
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -20,6 +20,7 @@ namespace SimpleFTPClient.Core
 
         public FTPClient()
         {
+            InitDefaultConnectionSettings();
             Credentials = InitCredentials();
         }
 
@@ -39,7 +40,14 @@ namespace SimpleFTPClient.Core
 
             // If username/password were included in url then set network credentials accordingly
             Credentials = InitCredentials(_baseUri.UserInfo);
-            
+
+            InitDefaultConnectionSettings();
+        }
+
+        private void InitDefaultConnectionSettings()
+        {
+            UsePassiveMode = true;
+            UseBinaryTransferMode = true;
         }
 
         private NetworkCredential InitCredentials(string userInfo = null)
@@ -74,9 +82,9 @@ namespace SimpleFTPClient.Core
 
         }
 
-        public async Task<MemoryStream> DownloadFileAsync(string relativePathToFile)
+        public async Task<System.IO.MemoryStream> DownloadFileAsync(string relativePathToFile)
         {
-            MemoryStream ms = new MemoryStream();
+            System.IO.MemoryStream ms = new System.IO.MemoryStream();
 
             if (string.IsNullOrWhiteSpace(relativePathToFile))
             {
@@ -92,7 +100,33 @@ namespace SimpleFTPClient.Core
 
             return ms;
         }
-        
+
+        public async Task<FileInfo> GetFileDetailsAsync(string relativePathToFile)
+        {
+            var res = MakeRequest(Enums.RequestType.LIST_CONTENTS, relativePathToFile);
+
+            using (System.IO.StreamReader reader = new System.IO.StreamReader(res.GetResponseStream()))
+            {
+                return FileInfo.FromString(await reader.ReadLineAsync());
+            }
+        }
+
+        public async Task<IEnumerable<FileInfo>> ListDirectoryDetailsAsync(string relativePathToFile)
+        {
+            var files = new List<FileInfo>();
+            var res = MakeRequest(Enums.RequestType.LIST_CONTENTS, relativePathToFile);
+
+            using (System.IO.StreamReader reader = new System.IO.StreamReader(res.GetResponseStream()))
+            {
+                while(!reader.EndOfStream)
+                {
+                    files.Add(FileInfo.FromString(await reader.ReadLineAsync()));
+                }
+            }
+
+            return files;
+        }
+
         public string HostName => BaseUri.Host;
         public Uri BaseUri => _baseUri;
         public bool UsePassiveMode { get; set; }

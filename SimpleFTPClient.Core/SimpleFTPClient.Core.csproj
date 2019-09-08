@@ -2,6 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Brad Francis</Authors>
+    <Company />
+    <Description>A simple FTP client</Description>
+    <Copyright>2019</Copyright>
+    <RepositoryUrl>https://github.com/bradfrancis/simple-ftp-client</RepositoryUrl>
   </PropertyGroup>
 
 </Project>

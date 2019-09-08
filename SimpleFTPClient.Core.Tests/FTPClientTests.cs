@@ -1,8 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SimpleFTPClient.Core.Tests
@@ -60,7 +59,7 @@ namespace SimpleFTPClient.Core.Tests
         }
 
         [TestMethod]
-        public async Task DownloadFile_ValidURL()
+        public async Task DownloadFileAsync_ValidURL()
         {
             var hostname = "ftp://ftp.bom.gov.au/";
             var filePath = "anon/gen/fwo/IDA00100.dat";
@@ -83,5 +82,42 @@ namespace SimpleFTPClient.Core.Tests
             Assert.IsTrue(fileInfo.Length > 0);
         }
 
+        [TestMethod]
+        public async Task GetFileDetailsFileAsync_ValidURL()
+        {
+            var hostname = "ftp://ftp.bom.gov.au/";
+            var filePath = "anon/gen/fwo/IDA00100.dat";
+            var fileName = Path.GetFileName(filePath);
+            var expectedModificationDate = new DateTime(2019, 9, 8, 17, 10, 0);
+
+            var client = new FTPClient(hostname);
+            client.UseBinaryTransferMode = true;
+            client.UsePassiveMode = true;
+
+            var fileInfo = await client.GetFileDetailsAsync(filePath);
+
+            Assert.AreEqual(fileName, fileInfo.FileName);
+            Assert.IsTrue(fileInfo.IsFile);
+            Assert.IsFalse(fileInfo.IsDirectory);
+            Assert.IsFalse(fileInfo.IsSymbolicLink);
+
+            Assert.AreEqual(670, fileInfo.FileSize);
+            Assert.AreEqual(expectedModificationDate, fileInfo.ModificationDate);
+        }
+
+        [TestMethod]
+        public async Task ListDirectoryDetailsAsync_ValidURL()
+        {
+            var hostname = "ftp://ftp.bom.gov.au/";
+            var filePath = "anon/gen/fwo/";
+
+            var client = new FTPClient(hostname);
+            client.UseBinaryTransferMode = true;
+            client.UsePassiveMode = true;
+
+            var files = (await client.ListDirectoryDetailsAsync(filePath));
+
+            Assert.IsTrue(files.Count() > 0);
+        }
     }
 }

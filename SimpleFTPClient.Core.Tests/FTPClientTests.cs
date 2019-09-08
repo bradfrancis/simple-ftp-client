@@ -66,8 +66,6 @@ namespace SimpleFTPClient.Core.Tests
             var fileName = Path.GetFileName(filePath);
 
             var client = new FTPClient(hostname);
-            client.UseBinaryTransferMode = true;
-            client.UsePassiveMode = true;
 
             using (var fs = await client.DownloadFileAsync(filePath))
             using (var outFile = File.Create(fileName))
@@ -91,8 +89,6 @@ namespace SimpleFTPClient.Core.Tests
             var expectedModificationDate = new DateTime(2019, 9, 8, 17, 10, 0);
 
             var client = new FTPClient(hostname);
-            client.UseBinaryTransferMode = true;
-            client.UsePassiveMode = true;
 
             var fileInfo = await client.GetFileDetailsAsync(filePath);
 
@@ -112,8 +108,6 @@ namespace SimpleFTPClient.Core.Tests
             var filePath = "anon/gen/fwo/";
 
             var client = new FTPClient(hostname);
-            client.UseBinaryTransferMode = true;
-            client.UsePassiveMode = true;
 
             var files = (await client.ListDirectoryDetailsAsync(filePath));
 
